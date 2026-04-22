@@ -7,31 +7,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const outputSection = document.getElementById('output-section');
     const charCount = document.getElementById('char-count');
 
-    // Character count update
+    // 1. Character count update
     inputArea.addEventListener('input', () => {
         charCount.textContent = `${inputArea.value.length} characters`;
     });
 
-    // Clear button logic
+    // 2. Clear button logic
     document.getElementById('clear-btn').addEventListener('click', () => {
         inputArea.value = '';
         outputSection.classList.add('hidden');
         charCount.textContent = '0 characters';
     });
 
-    // Main API call
+    // 3. Save to LocalStorage logic
+    document.getElementById('save-btn').addEventListener('click', () => {
+        localStorage.setItem('rtg_saved_note', inputArea.value);
+        alert('Note saved locally! ✅');
+    });
+
+    // 4. Copy to Clipboard logic (Reusable)
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const textToCopy = document.getElementById(targetId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalIcon = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => btn.innerHTML = originalIcon, 2000);
+            });
+        });
+    });
+
+    // 5. Main API call
     processBtn.addEventListener('click', async () => {
         const text = inputArea.value.trim();
-        if (!text) return alert('Bhai, pehle notes toh paste kar!');
+        if (!text) return alert('Bhai, pehle notes toh paste karo!');
 
         processBtn.disabled = true;
         loader.classList.remove('hidden');
         outputSection.classList.add('hidden');
 
         try {
-            // Yahan magic hoga - Backend call!
             const data = await fetchAIResponse(text);
             
+            // Populating UI with safety checks
             document.getElementById('out-summary').innerHTML = `<ul>${data.summary.map(item => `<li>${item}</li>`).join('')}</ul>`;
             document.getElementById('out-english').innerHTML = `<p>${data.englishExplanation}</p>`;
             document.getElementById('out-hinglish').innerHTML = `<p>${data.hinglishExplanation}</p>`;
@@ -42,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
             outputSection.classList.remove('hidden');
             outputSection.scrollIntoView({ behavior: 'smooth' });
         } catch (error) {
-            console.error(error);
-            alert('Error! Check console. Make sure Node server is running.');
+            console.error('App Error: - script.js:64', error);
+            alert('Server abhi sleep mode mein ho sakta hai. 10-20 sec wait karke phir try karo! 🚀');
             loader.classList.add('hidden');
         } finally {
             processBtn.disabled = false;
