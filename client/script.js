@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             outputSection.scrollIntoView({ behavior: 'smooth' });
         } catch (error) {
             console.error('App Error: - script.js:64', error);
-            alert('Server abhi sleep mode mein ho sakta hai. 10-20 sec wait karke phir try karo! 🚀');
+            alert('Server is not working , please wait! ');
             loader.classList.add('hidden');
         } finally {
             processBtn.disabled = false;
