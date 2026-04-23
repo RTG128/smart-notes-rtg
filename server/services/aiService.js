@@ -1,13 +1,20 @@
+const fetch = require('node-fetch');
+
 exports.getAiSummary = async (text) => {
-    // SECURITY: Hugging Face API key from environment
     const apiKey = process.env.HUGGINGFACE_API_KEY; 
     
-    if (!apiKey) {
-        throw new Error("API Key nahi mili! Render settings check karo.");
-    }
+    // Using a more advanced model that can follow JSON formatting
+    const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
-    // Hugging Face model endpoint
-    const API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn";
+    const prompt = `[INST] You are a helpful B.Tech tutor. Provide a summary of the following text in JSON format with these fields:
+    {
+        "summary": ["Point 1", "Point 2"],
+        "englishExplanation": "Simple explanation",
+        "hinglishExplanation": "Asli hinglish explanation",
+        "keyPoints": [{"term": "word", "def": "definition"}],
+        "realLifeExample": "Real world example"
+    }
+    Text: ${text} [/INST]`;
 
     try {
         const response = await fetch(API_URL, {
@@ -17,26 +24,20 @@ exports.getAiSummary = async (text) => {
                 "Content-Type": "application/json" 
             },
             body: JSON.stringify({ 
-                inputs: text,
-                parameters: { max_length: 150 } 
+                inputs: prompt,
+                parameters: { max_new_tokens: 500, return_full_text: false }
             }),
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Hugging Face API Error: - aiService.js:27", errorData);
-            throw new Error('API request failed');
-        }
-        
         const result = await response.json();
+        const output = result[0].generated_text;
         
-        // Hugging Face ka response structure
-        return { 
-            summary: [result[0]?.summary_text || "Summary generate nahi ho payi."] 
-        };
+        // JSON extract karna kyunki model extra text bhi de sakta hai
+        const jsonMatch = output.match(/\{[\s\S]*\}/);
+        return jsonMatch ? JSON.parse(jsonMatch[0]) : { summary: ["Error parsing AI response"] };
         
     } catch (error) {
-        console.error("AI Service Error: - aiService.js:39", error);
+        console.error("AI Service Error: - aiService.js:40", error);
         throw error;
     }
 };
