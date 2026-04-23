@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Save to LocalStorage logic
     document.getElementById('save-btn').addEventListener('click', () => {
         localStorage.setItem('rtg_saved_note', inputArea.value);
-        alert('Note saved locally! ✅');
+        alert('Note saved locally! ');
     });
 
     // 4. Copy to Clipboard logic (Reusable)
