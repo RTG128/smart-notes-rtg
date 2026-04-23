@@ -19,12 +19,13 @@ app.use('/api', summarizeRoutes);
 // Path ko root directory se fix kiya gaya hai
 app.use(express.static(path.join(__dirname, '../client')));
 
-app.get('*', (req, res) => {
+// '*' ki jagah '/*' use karo, yeh naye Express version mein sahi chalta hai
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 // --- PORT BINDING FIX ---
 // '0.0.0.0' add karne se Render ka "no open ports" wala error chala jayega
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server is running on port ${PORT} - server.js:29`);
+    console.log(`🚀 Server is running on port ${PORT} - server.js:30`);
 });
