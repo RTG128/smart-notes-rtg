@@ -1,7 +1,6 @@
-// Yeh function ab tumhare Live Render Backend ko call karega
 export async function fetchAIResponse(text) {
-    // Apne Render ka URL yahan set kar diya hai
-    const API_URL = 'https://rtg-smart-notes.onrender.com/api/summarize';
+    // Relative path use karo, yeh CORS error ko khatam kar dega
+    const API_URL = '/api/summarize';
 
     try {
         const response = await fetch(API_URL, {
@@ -13,15 +12,13 @@ export async function fetchAIResponse(text) {
         });
 
         if (!response.ok) {
-            // Agar backend se error aaye toh details ke saath throw karega
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Backend server response error');
+            throw new Error(errorData.message || 'Server se response nahi mila!');
         }
 
         return await response.json();
     } catch (error) {
-        console.error("API Error: - api.js:23", error);
-        // Error ko wapas script.js mein bhej rahe hain taaki user ko alert dikha sakein
+        console.error("API Error: - api.js:21", error);
         throw error;
     }
 }
