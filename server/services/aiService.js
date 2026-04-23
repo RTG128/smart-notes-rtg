@@ -1,30 +1,42 @@
 exports.getAiSummary = async (text) => {
-    // Yahan koi key hardcoded nahi hai, ye safe hai!
-    const apiKey = process.env.GEMINI_API_KEY; 
+    // SECURITY: Hugging Face API key from environment
+    const apiKey = process.env.HUGGINGFACE_API_KEY; 
     
     if (!apiKey) {
         throw new Error("API Key nahi mili! Render settings check karo.");
     }
 
-    const systemPrompt = `You are an expert tutor for B.Tech CSE students. 
-    Analyze the provided text and return ONLY a valid JSON object.`;
+    // Hugging Face model endpoint
+    const API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn";
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: text }] }],
-                generationConfig: { response_mime_type: "application/json" }
-            })
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { 
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({ 
+                inputs: text,
+                parameters: { max_length: 150 } 
+            }),
         });
 
-        if (!response.ok) throw new Error('API request failed');
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Hugging Face API Error: - aiService.js:27", errorData);
+            throw new Error('API request failed');
+        }
         
-        const data = await response.json();
-        return JSON.parse(data.candidates[0].content.parts[0].text);
+        const result = await response.json();
+        
+        // Hugging Face ka response structure
+        return { 
+            summary: [result[0]?.summary_text || "Summary generate nahi ho payi."] 
+        };
+        
     } catch (error) {
-        console.error("AI Error: - aiService.js:27", error);
+        console.error("AI Service Error: - aiService.js:39", error);
         throw error;
     }
 };
