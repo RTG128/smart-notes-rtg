@@ -1,24 +1,25 @@
 export async function fetchAIResponse(text) {
-    // Relative path use karo, yeh CORS error ko khatam kar dega
-    const API_URL = '/api/summarize';
+    const API_URL = 'http://localhost:5000/api/summarize';
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
+            headers: {
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ text: text })
+            body: JSON.stringify({ text })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Server se response nahi mila!');
+            throw new Error(data.error || 'Server error');
         }
 
-        return await response.json();
+        return data;
+
     } catch (error) {
-        console.error("API Error: - api.js:21", error);
+        console.error("API Error: - api.js:22", error);
         throw error;
     }
 }

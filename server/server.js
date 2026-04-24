@@ -1,9 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+require("dotenv").config();
 
-const summarizeRoutes = require('./routes/summarize');
+const summarizeRoutes = require("./routes/summarize");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -11,23 +11,19 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-// API Routes
-app.use('/api', summarizeRoutes);
+app.use("/api", summarizeRoutes);
 
-// --- STATIC FILE SERVING ---
-// Ye __dirname se 1 level upar 'client' folder dhoondega
-const clientPath = path.resolve(__dirname, '../client');
+const clientPath = path.join(__dirname, "../client");
 app.use(express.static(clientPath));
 
-// --- FIXED ROUTING ---
-app.use((req, res, next) => {
-    if (!req.path.startsWith('/api')) {
-        res.sendFile(path.join(clientPath, 'index.html'));
-    } else {
-        next();
-    }
+app.use((req, res) => {
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.join(clientPath, "index.html"));
+  } else {
+    res.status(404).json({ error: "API route not found" });
+  }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server is live on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} - server.js:28`);
 });

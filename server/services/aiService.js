@@ -1,43 +1,60 @@
-const fetch = require('node-fetch');
-
 exports.getAiSummary = async (text) => {
-    const apiKey = process.env.HUGGINGFACE_API_KEY; 
-    
-    // Using a more advanced model that can follow JSON formatting
-    const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
-
-    const prompt = `[INST] You are a helpful B.Tech tutor. Provide a summary of the following text in JSON format with these fields:
-    {
-        "summary": ["Point 1", "Point 2"],
-        "englishExplanation": "Simple explanation",
-        "hinglishExplanation": "Asli hinglish explanation",
-        "keyPoints": [{"term": "word", "def": "definition"}],
-        "realLifeExample": "Real world example"
-    }
-    Text: ${text} [/INST]`;
-
     try {
-        const response = await fetch(API_URL, {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
-            headers: { 
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json" 
+            headers: {
+                "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify({ 
-                inputs: prompt,
-                parameters: { max_new_tokens: 500, return_full_text: false }
-            }),
+            body: JSON.stringify({
+                model: "openai/gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "user",
+                        content: `Give response in JSON:
+{
+"summary": ["point1","point2"],
+"explanation": "simple english explanation",
+"hinglish": "hinglish explanation",
+"keyPoints": ["point1","point2"],
+"example": "real life example"
+}
+
+Text: ${text}`
+                    }
+                ]
+            })
         });
 
-        const result = await response.json();
-        const output = result[0].generated_text;
-        
-        // JSON extract karna kyunki model extra text bhi de sakta hai
-        const jsonMatch = output.match(/\{[\s\S]*\}/);
-        return jsonMatch ? JSON.parse(jsonMatch[0]) : { summary: ["Error parsing AI response"] };
-        
-    } catch (error) {
-        console.error("AI Service Error: - aiService.js:40", error);
-        throw error;
+        const data = await res.json();
+        const output = data?.choices?.[0]?.message?.content || "";
+
+        let parsed;
+
+        try {
+            const match = output.match(/\{[\s\S]*\}/);
+            parsed = match ? JSON.parse(match[0]) : {};
+        } catch {
+            parsed = {};
+        }
+
+        return {
+            summary: parsed.summary || ["Summary not available"],
+            explanation: parsed.explanation || "Explanation not generated",
+            hinglish: parsed.hinglish || "Hinglish not generated",
+            keyPoints: parsed.keyPoints || ["No key points"],
+            example: parsed.example || "No example available"
+        };
+
+    } catch (err) {
+        console.error(err);
+
+        return {
+            summary: ["Error"],
+            explanation: "Try again",
+            hinglish: "Dobara try karo 😄",
+            keyPoints: [],
+            example: "No example"
+        };
     }
 };

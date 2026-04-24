@@ -4,44 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Notes - Summarizer + Explainer</title>
+
     <link rel="stylesheet" href="style.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
+
         <header>
             <h1><i class="fa-solid fa-brain"></i> Smart Notes</h1>
             <p>Summarize & Understand Concepts</p>
         </header>
 
         <main>
+
             <section class="input-section glass-panel">
+
                 <div class="textarea-header">
                     <span id="char-count">0 characters</span>
+
                     <div class="action-icons">
-                        <button id="clear-btn" title="Clear Text"><i class="fa-solid fa-trash-can"></i></button>
-                        <button id="save-btn" title="Save to LocalStorage"><i class="fa-solid fa-floppy-disk"></i></button>
+                        <button id="clear-btn" title="Clear"><i class="fa-solid fa-trash"></i></button>
+                        <button id="save-btn" title="Save"><i class="fa-solid fa-floppy-disk"></i></button>
                     </div>
                 </div>
+
                 <textarea id="note-input" placeholder="Paste your notes here..."></textarea>
+
                 <button id="process-btn" class="primary-btn">
                     <span>Summarize & Explain</span>
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </button>
+
             </section>
 
+            <!-- 🔥 Loader improved -->
             <div id="loader" class="loader hidden">
                 <div class="spinner"></div>
-                <p>Processing with AI...</p>
+                <p>✨ AI is generating magic...</p>
             </div>
 
             <section id="output-section" class="output-section hidden">
+
                 <div class="output-grid">
+
                     <div class="card glass-panel">
                         <div class="card-header">
                             <h3><i class="fa-solid fa-list-ul"></i> Summary</h3>
-                            <button class="copy-btn" data-target="out-summary"><i class="fa-regular fa-copy"></i></button>
+                            <button class="copy-btn" data-target="out-summary">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
                         </div>
                         <div id="out-summary" class="card-content"></div>
                     </div>
@@ -49,15 +65,19 @@
                     <div class="card glass-panel">
                         <div class="card-header">
                             <h3><i class="fa-solid fa-lightbulb"></i> Simple English</h3>
-                            <button class="copy-btn" data-target="out-english"><i class="fa-regular fa-copy"></i></button>
+                            <button class="copy-btn" data-target="out-english">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
                         </div>
                         <div id="out-english" class="card-content"></div>
                     </div>
 
                     <div class="card glass-panel">
                         <div class="card-header">
-                            <h3><i class="fa-solid fa-language"></i> Hinglish Explanation</h3>
-                            <button class="copy-btn" data-target="out-hinglish"><i class="fa-regular fa-copy"></i></button>
+                            <h3><i class="fa-solid fa-language"></i> Hinglish</h3>
+                            <button class="copy-btn" data-target="out-hinglish">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
                         </div>
                         <div id="out-hinglish" class="card-content"></div>
                     </div>
@@ -65,7 +85,9 @@
                     <div class="card glass-panel">
                         <div class="card-header">
                             <h3><i class="fa-solid fa-key"></i> Key Points</h3>
-                            <button class="copy-btn" data-target="out-keys"><i class="fa-regular fa-copy"></i></button>
+                            <button class="copy-btn" data-target="out-keys">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
                         </div>
                         <div id="out-keys" class="card-content"></div>
                     </div>
@@ -73,24 +95,31 @@
                     <div class="card glass-panel full-width">
                         <div class="card-header">
                             <h3><i class="fa-solid fa-earth-americas"></i> Real-Life Example</h3>
-                            <button class="copy-btn" data-target="out-example"><i class="fa-regular fa-copy"></i></button>
+                            <button class="copy-btn" data-target="out-example">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
                         </div>
                         <div id="out-example" class="card-content"></div>
                     </div>
+
                 </div>
             </section>
+
         </main>
 
+        <!-- 🔥 Clean Footer -->
         <footer class="footer">
-            <p>Built by <strong>RTG Team</strong></p>
+            <p>Built by</p>
             <div class="social-links">
-                <a href="https://www.linkedin.com/in/rahul-mahto-1aa004294" target="_blank"><i class="fa-brands fa-linkedin"></i> Rahul</a>
-                <a href="https://www.linkedin.com/in/nikit-pradhan-156a18348" target="_blank"><i class="fa-brands fa-linkedin"></i> Nikit</a>
-                <a href="https://www.linkedin.com/in/rehaan-kumar-63b175391" target="_blank"><i class="fa-brands fa-linkedin"></i> Rehaan</a>
+                <a href="https://www.linkedin.com/in/rahul-mahto-1aa004294" target="_blank">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                </a>
             </div>
         </footer>
+
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="./script.js"></script>
+
 </body>
 </html>
