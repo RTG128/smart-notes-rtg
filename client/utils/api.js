@@ -1,14 +1,20 @@
 export async function fetchAIResponse(text) {
-    const API_URL = 'http://localhost:5000/api/summarize';
+    const API_URL = "https://rtg-smart-notes-backend.onrender.com/api/summarize";
 
     try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000); // 60 sec wait
+
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text }),
+            signal: controller.signal
         });
+
+        clearTimeout(timeout);
 
         const data = await response.json();
 
@@ -19,7 +25,7 @@ export async function fetchAIResponse(text) {
         return data;
 
     } catch (error) {
-        console.error("API Error: - api.js:22", error);
+        console.error("API Error: - api.js:28", error);
         throw error;
     }
 }
