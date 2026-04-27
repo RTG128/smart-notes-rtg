@@ -2,8 +2,12 @@ import { fetchAIResponse } from './utils/api.js';
 
 function typeEffect(element, text, speed = 12) {
     element.innerHTML = "";
-    let i = 0;
+    if (!text) {
+        element.innerHTML = "Not available";
+        return;
+    }
 
+    let i = 0;
     const interval = setInterval(() => {
         element.innerHTML += text.charAt(i);
         i++;
@@ -18,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const outputSection = document.getElementById('output-section');
     const charCount = document.getElementById('char-count');
 
+    // ✅ AUTO LOAD SAVED NOTE (NEW)
+    const savedNote = localStorage.getItem('rtg_saved_note');
+    if (savedNote) {
+        inputArea.value = savedNote;
+        charCount.textContent = `${savedNote.length} characters`;
+    }
+
     inputArea.addEventListener('input', () => {
         charCount.textContent = `${inputArea.value.length} characters`;
     });
@@ -26,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inputArea.value = '';
         outputSection.classList.add('hidden');
         charCount.textContent = '0 characters';
+        localStorage.removeItem('rtg_saved_note'); // ✅ sync clear
     });
 
     document.getElementById('save-btn').addEventListener('click', () => {
@@ -40,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
             navigator.clipboard.writeText(textToCopy);
 
             const original = btn.innerHTML;
-            btn.innerHTML = "✔";
-            setTimeout(() => btn.innerHTML = original, 1500);
+            btn.innerHTML = "✔ Copied";
+            setTimeout(() => btn.innerHTML = original, 1200);
         });
     });
 
@@ -58,20 +70,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await fetchAIResponse(text);
 
             document.getElementById('out-summary').innerHTML =
-                `<ul>${(data.summary || []).map(item => `<li>${item}</li>`).join('')}</ul>`;
+                `<ul>${(data.summary || ["No summary available"])
+                    .map(item => `<li>${item}</li>`).join('')}</ul>`;
 
-            typeEffect(document.getElementById('out-english'), data.explanation || '');
-            typeEffect(document.getElementById('out-hinglish'), data.hinglish || '');
-            typeEffect(document.getElementById('out-example'), data.example || '');
+            typeEffect(
+                document.getElementById('out-english'),
+                data.explanation || "Explanation not available"
+            );
+
+            typeEffect(
+                document.getElementById('out-hinglish'),
+                data.hinglish || "Hinglish not available"
+            );
+
+            typeEffect(
+                document.getElementById('out-example'),
+                data.example || "No example available"
+            );
 
             document.getElementById('out-keys').innerHTML =
-                `<ul>${(data.keyPoints || []).map(item => `<li>${item}</li>`).join('')}</ul>`;
+                `<ul>${(data.keyPoints || []).map(item => {
+                    if (typeof item === "object") {
+                        return `<li><strong>${item.term || ''}:</strong> ${item.def || ''}</li>`;
+                    }
+                    return `<li>${item}</li>`;
+                }).join('') || "<li>No key points</li>"}</ul>`;
 
             loader.classList.add('hidden');
             outputSection.classList.remove('hidden');
             outputSection.scrollIntoView({ behavior: 'smooth' });
 
         } catch (error) {
+            console.error(error);
             alert('Server is not working, please try again!');
             loader.classList.add('hidden');
         } finally {
